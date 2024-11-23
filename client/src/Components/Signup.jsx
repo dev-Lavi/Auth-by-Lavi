@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import "../App.css";
-import Axios from 'axios'
+import Axios from 'axios';
 
 
 const Signup = () => {
@@ -10,15 +10,16 @@ const Signup = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    Axios.post('http://localhost:3000/auth/Signup', {
+    Axios.post('http://localhost:3000/auth/signup', {
       username,
       email,
       password,
     }).then(response => {
+      console.log(response)
+    }).catch(err => {
       console.log(err)
-    });
-
-  }
+    })
+  };
 
   return (
     <div className="sign-up-container">

@@ -1,24 +1,37 @@
-import express from 'express'
-import bcryt from 'bcrypt'
+import express from 'express';
+import bcrypt from 'bcrypt'; // Fixed typo
+import { User } from '../models/User.js'; // Ensure this model is correctly defined
+
 const router = express.Router();
-import {User} from '../models/User.js'
 
 router.post('/signup', async (req, res) => {
-    const {username, email, password} = req.body;
-    const user = User.find({email})
-    if(user) {
-        return res.json({message: "user already existed"})
+  try {
+    const { username, email, password } = req.body;
+
+    // Check if the user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
     }
 
-    const hashpassword = await bcryt.hash(password, 10)
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user
     const newUser = new User({
-        username,
-        email,
-        password: hashpassword,
-    })
+      username,
+      email,
+      password: hashedPassword,
+    });
 
-    await newUser.save()
-    return res.json({message: "record registed"})
-})
+    // Save the user to the database
+    await newUser.save();
 
-export {router as UserRouter}
+    return res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+export { router as UserRouter };
